@@ -1,0 +1,6 @@
+THIS CODE IS MY ON WORK, IT WAS WRITTEN WITHOUT CONSULTING CODE WRITTEN BY OTHER STUDENTS OR LARGE LANGUAGE MODELS SUCH AS CHATGPT.
+
+Yilang (Lance) Ding
+
+I collaborated with the following classmates for this homework:
+N/A

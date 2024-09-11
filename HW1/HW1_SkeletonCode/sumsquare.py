@@ -1,8 +1,13 @@
-import numpy as np
-import timeit
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+import pip
+
+try:
+    import numpy as np
+    import timeit
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+except ImportError:
+    pip.main(['install', 'seaborn', 'matplotlib', 'pandas', 'numpy'])
 
 """
 Vectorization Comparison for Computing Sum of Squares
