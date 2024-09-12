@@ -3,7 +3,20 @@ Pandas DataFrame Manipulation with Palmer Penguins Dataset
 ~~~~~~
 Follow the instructions in the homework to complete the assignment.
 """
-import pandas as pd
+try:
+    import numpy as np
+    import timeit
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+except ImportError:
+    import pip
+    pip.main(['install', 'seaborn', 'matplotlib', 'pandas', 'numpy'])
+    import numpy as np
+    import timeit
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
 
 def load_csv(inputfile):
     """
@@ -20,6 +33,7 @@ def load_csv(inputfile):
         return the pandas dataframe with the contents
         from the csv inputfile
     """
+    # Assuming that the inputfile actually contains a valid filepath and doesn't require exception handling
     return pd.read_csv(inputfile)
 
 
@@ -40,7 +54,6 @@ def remove_na(inputdf, colname):
     outputdf : pandas.DataFrame
         return the pandas dataframe with the modified contents
     """
-    # TODO: Implement this function
 
     return inputdf.dropna(subset=[colname])
 
@@ -63,8 +76,7 @@ def onehot(inputdf, colname):
     outputdf : pandas.DataFrame
         return the pandas dataframe with the modified contents
     """
-    # TODO: Implement this function
-    return pd.get_dummies(inputdf, columns=[colname])
+    return pd.get_dummies(inputdf, columns=[colname], dtype=int)
 
 
 def to_numeric(inputdf):
@@ -82,7 +94,6 @@ def to_numeric(inputdf):
         return the numeric contents of the input dataframe as a 
         numpy array
     """
-    # TODO: Implement this function
     return inputdf.select_dtypes(include=['number']).to_numpy()
 
 
@@ -90,14 +101,23 @@ def main():
     # Load data
     df = load_csv("data/penguins.csv")
 
+    # # Debug
+    # print(df.shape)
+    # print(df.isna().sum())
+
     # Remove NA
     df = remove_na(df, "species")
+    # print(df.shape)
 
     # One hot encoding
     df = onehot(df, "species")
+    # print(df.columns)
+    # print(df[['species_Chinstrap', 'species_Gentoo', 'species_Adelie']].head(None))
+    print(df.head(None))
 
     # Convert to numeric
     df_np = to_numeric(df)
+    print(df_np)
 
 
 if __name__ == "__main__":

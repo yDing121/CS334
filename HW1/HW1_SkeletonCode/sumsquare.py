@@ -1,5 +1,3 @@
-import pip
-
 try:
     import numpy as np
     import timeit
@@ -7,6 +5,7 @@ try:
     import seaborn as sns
     import matplotlib.pyplot as plt
 except ImportError:
+    import pip
     pip.main(['install', 'seaborn', 'matplotlib', 'pandas', 'numpy'])
     import numpy as np
     import timeit
