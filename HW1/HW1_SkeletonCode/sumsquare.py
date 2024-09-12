@@ -8,6 +8,11 @@ try:
     import matplotlib.pyplot as plt
 except ImportError:
     pip.main(['install', 'seaborn', 'matplotlib', 'pandas', 'numpy'])
+    import numpy as np
+    import timeit
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
 
 """
 Vectorization Comparison for Computing Sum of Squares
@@ -29,7 +34,7 @@ def gen_random_samples(n):
     return np.random.randn(n)
 
 
-def sum_squares_for(samples):
+def sum_squares_for(samples: np.array):
     """
     Compute the sum of squares using a forloop
 
@@ -44,14 +49,14 @@ def sum_squares_for(samples):
         The sum of squares of the samples
     """
     
-    sum = 0
+    ret = 0
     for s in samples:
-        sum += s**2
+        ret += s**2
     
-    return sum 
+    return ret
 
 
-def sum_squares_np(samples):
+def sum_squares_np(samples: np.array):
     """
     Compute the sum of squares using Numpy's dot module
 
@@ -68,7 +73,7 @@ def sum_squares_np(samples):
     return samples @ samples
 
 
-def time_ss(sample_list):
+def time_ss(sample_list: list[int]):
     """
     Time it takes to compute the sum of squares
     for varying number of samples. The function should
@@ -78,7 +83,7 @@ def time_ss(sample_list):
 
     Parameters
     ----------
-    samples : list of length n
+    sample_list : list of length n
         A list of integers to .
 
     Returns
@@ -89,18 +94,22 @@ def time_ss(sample_list):
         and the timing in seconds associated with that 
         number of samples.
     """
-    ss_dict = {}
-    ss_dict['n'] = sample_list
+    ss_dict = dict()
+    ss_dict['n'] = []
     ss_dict['ssfor'] = []
     ss_dict['ssnp'] = []
 
     for n in sample_list:
+        # Insert n
         data = gen_random_samples(n)
-        
+        ss_dict['n'].append(n)
+
+        # Time ssfor
         start = timeit.default_timer()
         sum_squares_for(data)
         ss_dict['ssfor'].append(timeit.default_timer() - start)
 
+        # Time ssnp
         start = timeit.default_timer()
         sum_squares_np(data)
         ss_dict['ssnp'].append(timeit.default_timer() - start)
@@ -108,7 +117,7 @@ def time_ss(sample_list):
     return ss_dict
 
 
-def timess_to_df(ss_dict):
+def timess_to_df(ss_dict: dict):
     """
     Time the time it takes to compute the sum of squares
     for varying number of samples.
@@ -129,7 +138,7 @@ def timess_to_df(ss_dict):
     """
 
     ret = pd.DataFrame.from_dict(ss_dict)
-    print(ret.head())
+    print(ret.head(None))
     return ret
 
 
@@ -145,16 +154,21 @@ def main():
     npt.assert_almost_equal(ss_for, ss_np, decimal=5)
 
 
-if __name__ == "__main__":
-    main()
-    timings = timess_to_df(time_ss([10**i for i in range(1, 6)]))
-    # fig, ax = plt.subplots()
+def compare_times(problem_sizes: list[int]=[10 ** i for i in range(1, 8)]):
+    """"""
+
+    timings = timess_to_df(time_ss(problem_sizes))
     sns.scatterplot(data=timings, x='n', y='ssnp', marker='s')
     sns.scatterplot(data=timings, x='n', y='ssfor', marker='o')
-    plt.xlabel("Problem size (log scale) n")
+    plt.xlabel("Problem size (n)")
     plt.ylabel("Runtime (seconds)")
     plt.xscale('log')
     plt.legend(labels=['ssnp', 'ssfor'])
     plt.grid()
     plt.title("Runtime comparison for squaring n numbers:\nfor loop VS numpy")
     plt.show()
+
+if __name__ == "__main__":
+    main()
+    compare_times()
+
