@@ -155,7 +155,18 @@ def main():
 
 
 def compare_times(problem_sizes: list[int]=[10 ** i for i in range(1, 8)]):
-    """"""
+    """
+    Generates and displays a matplotlib scatter plot using seaborn to compare the running time of ssfor and ssnp
+
+
+    Parameters
+    ----------
+    problem_sizes: list of problems sizes that the two versions of the ss algorithm will take on.
+
+    Returns
+    -------
+    None
+    """
 
     timings = timess_to_df(time_ss(problem_sizes))
     sns.scatterplot(data=timings, x='n', y='ssnp', marker='s')
