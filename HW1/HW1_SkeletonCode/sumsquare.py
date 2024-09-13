@@ -171,7 +171,7 @@ def compare_times(problem_sizes: list[int]=[int(10 ** i) for i in np.linspace(1,
     sns.scatterplot(data=timings, x='n', y='ssfor', marker='o')
     plt.xlabel("Problem size (n)")
     plt.ylabel("Runtime (seconds)")
-    plt.xscale('log')
+    plt.xscale('log') # Easier to see
     plt.legend(labels=['ssnp', 'ssfor'])
     plt.grid()
     plt.title("Runtime comparison for squaring n numbers:\nfor loop VS numpy")
