@@ -152,11 +152,10 @@ def main():
     import numpy.testing as npt
     npt.assert_almost_equal(ss_for, ss_np, decimal=5)
 
-
-def compare_times(problem_sizes: list[int]=[10 ** i for i in range(1, 8)]):
+def compare_times(problem_sizes: list[int]=[int(10 ** i) for i in np.linspace(1, 8, 15)]):
     """
     Generates and displays a matplotlib scatter plot using seaborn to compare the running time of ssfor and ssnp
-
+    Read this section for Q3 part f
 
     Parameters
     ----------
