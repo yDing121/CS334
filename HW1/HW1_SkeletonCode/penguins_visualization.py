@@ -1,5 +1,3 @@
-from matplotlib.lines import Line2D
-
 try:
     import numpy as np
     import timeit
@@ -7,6 +5,7 @@ try:
     import seaborn as sns
     import matplotlib.pyplot as plt
     import palmer
+    from matplotlib.lines import Line2D
 except ImportError:
     import pip
     pip.main(['install', 'seaborn', 'matplotlib', 'pandas', 'numpy'])
@@ -16,6 +15,7 @@ except ImportError:
     import seaborn as sns
     import matplotlib.pyplot as plt
     import palmer
+    from matplotlib.lines import Line2D
 
 
 def question1():
@@ -30,7 +30,18 @@ def question1():
 
     # Load data
     df = palmer.load_csv("data/penguins.csv")
-    print(df.head())
+    # print(df.head())
+    # print(df.isna().sum())
+
+    # Delete NA
+    df_nona = df.copy(deep=True)
+    numerical_features = ['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']
+
+    for feature in numerical_features:
+        df_nona = palmer.remove_na(df_nona, feature)
+        # print(df_nona.isna().sum())
+        # print("-----")
+
 
     # Side by side for easier comparison
     fig, axs = plt.subplots(1, 2, figsize=(9,6))
@@ -43,7 +54,7 @@ def question1():
 
     # Draw histograms (Shouldn't we use bar plots since we are working with categorical data?)
     draw_species_histogram(df, axs[0])
-    draw_species_histogram(palmer.remove_na(df, "species"), axs[1])
+    draw_species_histogram(df_nona, axs[1])
 
     # Clear individual subplot labels
     axs[0].set_xlabel("")
