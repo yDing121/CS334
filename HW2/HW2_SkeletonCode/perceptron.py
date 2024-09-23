@@ -64,10 +64,11 @@ def perceptron(X, y):
 
 def main(fname):
     X, y = load_data(fname, d=2)
+    theta, b, alpha = perceptron(X, y)
 
     # # Uncomment to see question (e) in action - we get a faster convergence.
-    # X, y = shuffle(X, y, random_state=0)
-    theta, b, alpha = perceptron(X, y)
+    # X_s, y_w = shuffle(X, y, random_state=0)
+    # theta, b, alpha = perceptron(X, y)
 
     print("Done!")
     print("============== Classifier ==============")
