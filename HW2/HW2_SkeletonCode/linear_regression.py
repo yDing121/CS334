@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_6
 import seaborn as sns
+np.random.seed(69)
 
 from helper import load_data
 import time
@@ -219,10 +220,10 @@ def part_1(fname_train):
 
     # print('Time elapsed:', time.process_time() - start)
 
-    # TODO: Add more code here to complete part 1
     ##############################
 
     lrs = [1e-4, 1e-3, 1e-2, 1e-1]
+    # lrs = [1e-4, 1e-3, 1e-2]
 
     # GD
     print("GD\n")
@@ -243,9 +244,16 @@ def part_1(fname_train):
         print(f"Theta:\t{theta}\n")
 
     # Closed form
-    print("Closed form\n")
+    print("=="*4 + "Closed form" + "=="*4)
     start = time.process_time()
     theta = ls_closed_form_solution(Phi_train, y_train)
+    print('Time elapsed:', time.process_time() - start)
+    print(f"Theta:\t{theta}\n")
+
+    # SGD adaptive lr
+    print("==" * 4 + f"learning rate:\tAdaptive" + "==" * 4)
+    start = time.process_time()
+    theta = ls_stochastic_gradient_descent(Phi_train, y_train, learning_rate='adaptive')
     print('Time elapsed:', time.process_time() - start)
     print(f"Theta:\t{theta}\n")
 
