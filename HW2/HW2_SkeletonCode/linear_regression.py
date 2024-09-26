@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_6
 import seaborn as sns
+from numpy.f2py.crackfortran import true_intent_list
+
 np.random.seed(69)
 
 from helper import load_data
@@ -55,9 +57,11 @@ def calculate_RMS_Error(X, y, theta):
     Returns:
         E_rms: float. The root mean square error as defined in the assignment.
     """
-    # # TODO: Implement this function
-    # E_rms = ???
-    # return E_rms
+    assert X.shape[0] == y.size and X.shape[1] == theta.size
+    n = X.shape[0]
+
+    E_rms = np.sqrt((1/n) * ((y - X @ theta) @ (y - X @ theta)))
+    return E_rms
 
 
 def ls_gradient_descent(X, y, learning_rate=0):
@@ -180,9 +184,11 @@ def ls_closed_form_solution(X, y, reg_param=0):
         theta: np.array, shape (d,)
     """
     assert X.shape[0] == y.size
+    d = X.shape[1]
 
     # theta = np.linalg.inv(X.T @ X) @ X.T @ y
-    theta = np.linalg.pinv(X) @ y
+    # theta = np.linalg.pinv(X) @ y
+    theta = np.linalg.inv(X.T @ X + reg_param * np.eye(d, d)) @ X.T @ y
     return theta
 
 
@@ -264,6 +270,70 @@ def part_2(fname_train, fname_validation):
     """
     This function should contain all the code you implement to complete part 2
     """
+
+    def eval_gen_gap_poly_deg(X_t, y_t, X_val, y_val, M):
+        poly_deg = [i for i in range(M+1)]
+        train_error = []
+        val_error = []
+        plt.xscale("linear")
+
+        for M in poly_deg:
+            Phi_train = generate_polynomial_features(X_t, M)
+            theta = ls_closed_form_solution(Phi_train, y_t)
+            train_error.append(calculate_RMS_Error(Phi_train, y_t, theta))
+
+            Phi_val = generate_polynomial_features(X_val, M)
+            val_error.append(calculate_RMS_Error(Phi_val, y_val, theta))
+
+        # Val error plot
+        sns.lineplot(x=poly_deg, y=val_error, label="Validation Error")
+        sns.scatterplot(x=poly_deg, y=val_error, marker='o')
+
+        # Train error plot - we use a separate scatterplot to plot the points
+        sns.lineplot(x=poly_deg, y=train_error, label="Train Error")
+        sns.scatterplot(x=poly_deg, y=train_error, marker='o')
+
+        # Add title and axis labels
+        plt.title("Train vs Validation Error on Polynomial Degree")
+        plt.xlabel("Polynomial Degree")
+        plt.ylabel("Error")
+
+        # Add a legend
+        plt.legend()
+        plt.show()
+
+    def eval_gen_gap_reg_param(X_t, y_t, X_val, y_val, M, reg):
+        poly_deg = M
+        train_error = []
+        val_error = []
+        plt.xscale("symlog", linthresh=1e-8)
+
+        for reg_param in reg:
+            Phi_train = generate_polynomial_features(X_t, M)
+            theta = ls_closed_form_solution(Phi_train, y_t, reg_param)
+            train_error.append(calculate_RMS_Error(Phi_train, y_t, theta))
+
+            Phi_val = generate_polynomial_features(X_val, M)
+            val_error.append(calculate_RMS_Error(Phi_val, y_val, theta))
+
+        # Val error plot
+        sns.lineplot(x=reg, y=val_error, label="Validation Error")
+        sns.scatterplot(x=reg, y=val_error, marker='o')
+
+        # Train error plot - we use a separate scatterplot to plot the points
+        sns.lineplot(x=reg, y=train_error, label="Train Error")
+        sns.scatterplot(x=reg, y=train_error, marker='o')
+
+
+        # Add title and axis labels
+        plt.title("Train vs Validation Error on Polynomial Degree\nwith L2 Regularization")
+        plt.xlabel("Regularization Parameter")
+        plt.ylabel("Error")
+
+        # Add a legend
+        plt.legend()
+        plt.show()
+
     print("=========== Part 2 ==========")
 
     X_train, y_train = load_data(fname_train)
@@ -271,6 +341,15 @@ def part_2(fname_train, fname_validation):
 
     # TODO: Add more code here to complete part 2
     ##############################
+
+    eval_gen_gap_poly_deg(X_train, y_train, X_validation, y_validation,
+                 10)
+
+    regs = [0] + [10**i for i in range(-8, 1)]
+    print(regs)
+    eval_gen_gap_reg_param(X_train, y_train, X_validation, y_validation,
+                 10, regs)
+
 
     print("Done!")
 
@@ -291,10 +370,10 @@ def part_3(fname_train, fname_validation):
 
 
 def main(fname_train, fname_validation):
-    part_1(fname_train)
-    # part_2(fname_train, fname_validation)
+    # part_1(fname_train)
+    part_2(fname_train, fname_validation)
     # part_3(fname_train, fname_validation)
 
 
 if __name__ == '__main__':
-    main("data/linreg_train.csv", "data/linreg_validation.csv")
+    main("dataset/linreg_train.csv", "dataset/linreg_validation.csv")
