@@ -1,3 +1,6 @@
+import pip
+pip.main(["install", "numpy", "pandas", "sklearn"])
+
 import numpy as np
 import pandas as pd
 
