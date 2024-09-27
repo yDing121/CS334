@@ -3,10 +3,11 @@ Perceptron Algorithm with Offset
 ~~~~~~
 Follow the instructions in the homework to complete the assignment.
 """
+import pip
+pip.main(["install", "numpy", "pandas", "scikit-learn"])
 
 import numpy as np
 from helper import load_data
-from sklearn.utils import shuffle
 
 def all_correct(X, y, theta, b):
     """
@@ -67,6 +68,7 @@ def main(fname):
     theta, b, alpha = perceptron(X, y)
 
     # # Uncomment to see question (e) in action - we get a faster convergence.
+    # from sklearn.utils import shuffle
     # X_s, y_w = shuffle(X, y, random_state=0)
     # theta, b, alpha = perceptron(X, y)
 
