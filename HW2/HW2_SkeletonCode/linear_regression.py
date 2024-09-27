@@ -3,12 +3,13 @@ Linear Regression
 ~~~~~~
 Follow the instructions in the homework to complete the assignment.
 """
+import pip
+pip.main(["install", "numpy", "matplotlib", "seaborn"])
+
 
 import numpy as np
 import matplotlib.pyplot as plt
-from fontTools.ttLib.tables.E_B_D_T_ import ebdt_bitmap_format_6
 import seaborn as sns
-from numpy.f2py.crackfortran import true_intent_list
 
 np.random.seed(69)
 
@@ -205,9 +206,18 @@ def weighted_ls_closed_form_solution(X, y, weights, reg_param=0):
     Returns:
         theta: np.array, shape (d,)
     """
-    # # TODO: Implement this function
-    # theta = ???
-    # return theta
+    assert X.shape[0] == y.size and X.shape[0] == weights.size
+    n = X.shape[0]
+    d = X.shape[1]
+
+
+    W = np.zeros((n , n))
+    for i in range(n):
+        W[i, i] = weights[i]
+
+    # theta = 0
+    theta = np.linalg.inv(X.T @ W @ X + reg_param * np.eye(d)) @ X.T @ W @ y
+    return theta
 
 
 def part_1(fname_train):
@@ -303,7 +313,6 @@ def part_2(fname_train, fname_validation):
         plt.show()
 
     def eval_gen_gap_reg_param(X_t, y_t, X_val, y_val, M, reg):
-        poly_deg = M
         train_error = []
         val_error = []
         plt.xscale("symlog", linthresh=1e-8)
@@ -326,7 +335,8 @@ def part_2(fname_train, fname_validation):
 
 
         # Add title and axis labels
-        plt.title("Train vs Validation Error on Polynomial Degree\nwith L2 Regularization")
+        plt.title("Train vs Validation Error on Regularization Parameter\n"
+                  "with a 10th degree Polynomial and L2 Regularization")
         plt.xlabel("Regularization Parameter")
         plt.ylabel("Error")
 
@@ -338,15 +348,12 @@ def part_2(fname_train, fname_validation):
 
     X_train, y_train = load_data(fname_train)
     X_validation, y_validation = load_data(fname_validation)
+    regs = [0] + [10**i for i in range(-8, 1)]
 
-    # TODO: Add more code here to complete part 2
-    ##############################
 
     eval_gen_gap_poly_deg(X_train, y_train, X_validation, y_validation,
                  10)
 
-    regs = [0] + [10**i for i in range(-8, 1)]
-    print(regs)
     eval_gen_gap_reg_param(X_train, y_train, X_validation, y_validation,
                  10, regs)
 
@@ -360,19 +367,50 @@ def part_3(fname_train, fname_validation):
     """
     print("=========== Part 3 ==========")
 
+    def eval_gen_gap_poly_deg(X_t, y_t, W_T, X_val, y_val, W_val, M):
+        poly_deg = [i for i in range(M+1)]
+        train_error = []
+        val_error = []
+        plt.xscale("linear")
+
+        for M in poly_deg:
+            Phi_train = generate_polynomial_features(X_t, M)
+            # print(Phi_train)
+            theta = weighted_ls_closed_form_solution(Phi_train, y_t, W_T)
+            train_error.append(calculate_RMS_Error(Phi_train, y_t, theta))
+
+            Phi_val = generate_polynomial_features(X_val, M)
+            val_error.append(calculate_RMS_Error(Phi_val, y_val, theta))
+
+        # Val error plot
+        sns.lineplot(x=poly_deg, y=val_error, label="Validation Error")
+        sns.scatterplot(x=poly_deg, y=val_error, marker='o')
+
+        # Train error plot - we use a separate scatterplot to plot the points
+        sns.lineplot(x=poly_deg, y=train_error, label="Train Error")
+        sns.scatterplot(x=poly_deg, y=train_error, marker='o')
+
+        # Add title and axis labels
+        plt.title("Train vs Validation Error on Polynomial Degree\nFor Weighted Linear Regression")
+        plt.xlabel("Polynomial Degree")
+        plt.ylabel("Error")
+
+        # Add a legend
+        plt.legend()
+        plt.show()
+
     X_train, y_train, weights_train = load_data(fname_train, weighted=True)
     X_validation, y_validation, weights_validation = load_data(fname_validation, weighted=True)
 
-    # TODO: Add more code here to complete part 3
-    ##############################
+    eval_gen_gap_poly_deg(X_train, y_train, weights_train, X_validation, y_validation, weights_validation, 10)
 
     print("Done!")
 
 
 def main(fname_train, fname_validation):
-    # part_1(fname_train)
+    part_1(fname_train)
     part_2(fname_train, fname_validation)
-    # part_3(fname_train, fname_validation)
+    part_3(fname_train, fname_validation)
 
 
 if __name__ == '__main__':
