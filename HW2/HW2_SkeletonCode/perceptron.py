@@ -87,8 +87,8 @@ def main(fname):
 
 
 if __name__ == '__main__':
-    main("data/classification.csv")
-    X, y = load_data("data/classification.csv", d=2)
+    main("dataset/classification.csv")
+    X, y = load_data("dataset/classification.csv", d=2)
     theta, b, alpha = perceptron(X, y)
 
     print("="*20)
