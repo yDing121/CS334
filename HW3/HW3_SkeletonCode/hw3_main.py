@@ -32,8 +32,26 @@ def generate_feature_vector(df):
     timeseries_variables = config['timeseries']
     feature_dict = {}
 
-    # TODO: Implement this function
-    ???
+    # Static variables
+    for var in static_variables:
+        val = df[df["Variable"] == var]["Value"].values[0]
+        feature_dict[var] = val
+
+        if val < 0:
+            feature_dict[var] = np.nan
+        else:
+            feature_dict[var] = val
+
+    # Time-varying variables
+    for var in timeseries_variables:
+        if (df['Variable'] == var).sum() == 0:
+            val = np.nan
+        else:
+            val = (df[df["Variable"] == var]["Value"]).mean()
+        feature_dict[f"mean_{var}"] = val
+
+    for k, v in feature_dict.items():
+        print(k, v)
 
     return feature_dict
 
@@ -76,7 +94,7 @@ def performance(clf, X, y_true, metric='accuracy'):
         X : (N,d) np.array containing features
         y_true: (N,) np.array containing true labels
         metric: string specifying the performance metric (default='accuracy'
-                 other options: 'precision', 'sensitivity', 'specificity', 
+                 other options: 'precision', 'sensitivity', 'specificity',
                 'f1-score', 'auroc', and 'auprc')
     Returns:
         the performance measure as a float
@@ -99,7 +117,7 @@ def cv_performance(clf, X, y, k=5, metric='accuracy'):
         y: (N,) array of binary labels {1,-1}
         k: an int specifying the number of folds (default=5)
         metric: string specifying the performance metric (default='accuracy'
-             other options: 'precision', 'sensitivity', 'specificity', 
+             other options: 'precision', 'sensitivity', 'specificity',
                 'f1-score', 'auroc', and 'auprc')
     Returns:
         average cross-validation performance across the k folds as a float
@@ -131,7 +149,7 @@ def select_C(X, y, C_range=[], penalty='l2', k=5, metric='accuracy'):
         y: (N,) array of binary labels {1,-1}
         k: int specifying the number of folds for cross-validation (default=5)
         metric: string specifying the performance metric (default='accuracy',
-             other options: 'precision', 'sensitivity', 'specificity', 
+             other options: 'precision', 'sensitivity', 'specificity',
                 'f1-score', 'auroc', and 'auprc')
         penalty: whether to use 'l1' or 'l2' regularization (default='l2')
         C_range: a list of hyperparameter C values to be searched over
@@ -245,7 +263,7 @@ def q2(X_train, y_train, X_test, y_test, metric_list, feature_names):
 
 def main():
     np.random.seed(42)
-    
+
     # Read data
     # NOTE: READING IN THE DATA WILL NOT WORK UNTIL YOU HAVE FINISHED
     #       IMPLEMENTING generate_feature_vector, fill_missing_values AND normalize_feature_matrix
@@ -253,10 +271,19 @@ def main():
 
     # TODO: Questions 1, 2
     metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
-    
+
     q1(X_train, feature_names)
     q2(X_train, y_train, X_test, y_test, metric_list, feature_names)
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    # df_labels = pd.read_csv('data/labels.csv')
+    # df_labels = df_labels[:1]
+    # IDs = df_labels['RecordID'][:1]
+    # raw_data = {}
+    # for i in tqdm(IDs, desc='Loading files from disk'):
+    #     raw_data[i] = pd.read_csv('data/files/{}.csv'.format(i))
+    #
+    # # generate_feature_vector()
+    # features = Parallel(n_jobs=16)(delayed(generate_feature_vector)(df) for _, df in tqdm(raw_data.items(), desc='Generating feature vectors'))
