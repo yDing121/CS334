@@ -119,14 +119,14 @@ def performance(clf, X, y_true, metric='accuracy'):
     elif metric == "specificity": # ratio of correct negative classifications over all actual negatives
         tn, fp, fn, tp = metrics.confusion_matrix(y_true=y_true, y_pred=y_pred).ravel()
         return tn/(tn + fp)
-    elif metric == "f1-score": # harmonic mean of precision and recall
+    elif metric == "f1_score": # harmonic mean of precision and recall
         return metrics.f1_score(y_true=y_true, y_pred=y_pred)
     elif metric == "auroc": #
-        prob = clf.predict_proba(X)[:, 1] # get the score for positive class
-        return metrics.roc_auc_score(y_true=y_true, y_score=prob)
+        scores = clf.decision_function(X)
+        return metrics.roc_auc_score(y_true=y_true, y_score=scores)
     elif metric == "auprc":
-        prob = clf.predict_proba(X)[:, 1] # get the score for positive class
-        return metrics.average_precision_score(y_true=y_true, y_score=prob)
+        scores = clf.decision_function(X)
+        return metrics.average_precision_score(y_true=y_true, y_score=scores)
     else:
         print("Unknown metric requested, aborting")
         return
@@ -305,9 +305,16 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+
+    X_train, y_train, X_test, y_test, feature_names = get_train_test_split()
+    clf = get_classifier()
+    clf.fit(X_train, y_train)
 
 
+    metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
+    for m in metric_list:
+        print(f"{m}:\t{performance(clf, X_test, y_test, m)}")
     # df_labels = pd.read_csv('data/labels.csv')
     # df_labels = df_labels[:2500]
     # IDs = df_labels['RecordID'][:2500]
