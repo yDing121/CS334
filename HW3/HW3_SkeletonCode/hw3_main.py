@@ -65,7 +65,6 @@ def impute_missing_values(X):
         X: np.array, shape (N, d). X does not contain any missing values
     """
 
-
     for col in range(X.shape[1]):
         mean = np.nanmean(X[:, col])
         X[:, col] = np.where(np.isnan(X[:, col]), mean, X[:, col])
@@ -73,18 +72,23 @@ def impute_missing_values(X):
     return X
 
 
-# def normalize_feature_matrix(X):
-#     """
-#     For each feature column, normalize all values to range [0, 1].
-#
-#     Input:
-#         X: np.array, shape (N, d).
-#     Returns:
-#         X: np.array, shape (N, d). Values are normalized per column.
-#     """
-#     # TODO: Implement this function
-#     ???
-#     return X
+def normalize_feature_matrix(X):
+    """
+    For each feature column, normalize all values to range [0, 1].
+
+    Input:
+        X: np.array, shape (N, d).
+    Returns:
+        X: np.array, shape (N, d). Values are normalized per column.
+    """
+
+    for col in range(X.shape[1]):
+        colmin = np.min(X[:, col])
+        colmax = np.max(X[:, col])
+
+        X[:, col] = (X[:, col] - colmin)/(colmax - colmin)
+
+    return X
 #
 #
 # def performance(clf, X, y_true, metric='accuracy'):
@@ -295,3 +299,11 @@ if __name__ == '__main__':
     # print(X)
 
     X = hw3_main.impute_missing_values(X)
+
+    xdf = pd.DataFrame(X)
+    print(xdf.describe())
+
+    X = normalize_feature_matrix(X)
+
+    xdf = pd.DataFrame(X)
+    print(xdf.describe())
