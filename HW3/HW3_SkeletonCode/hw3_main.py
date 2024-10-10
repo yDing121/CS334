@@ -89,7 +89,7 @@ def normalize_feature_matrix(X):
         X[:, col] = (X[:, col] - colmin)/(colmax - colmin)
 
     return X
-#
+
 #
 # def performance(clf, X, y_true, metric='accuracy'):
 #     """
