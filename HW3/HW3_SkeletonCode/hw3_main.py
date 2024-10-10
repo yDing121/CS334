@@ -132,41 +132,41 @@ def performance(clf, X, y_true, metric='accuracy'):
         return
 
 
-# def cv_performance(clf, X, y, k=5, metric='accuracy'):
-#     """
-#     Splits the data X and the labels y into k folds.
-#     Then, for each fold i in 1...k,
-#         Train a classifier on all the data except the i-th fold, and test on the i-th fold.
-#         Calculate the performance of the classifier and save the result.
-#     In the end, return the average performance across the k folds.
-#     Input:
-#         clf: an instance of sklearn estimator
-#         X: (N,d) array of feature vectors, where n is the number of examples
-#            and d is the number of features
-#         y: (N,) array of binary labels {1,-1}
-#         k: an int specifying the number of folds (default=5)
-#         metric: string specifying the performance metric (default='accuracy'
-#              other options: 'precision', 'sensitivity', 'specificity',
-#                 'f1-score', 'auroc', and 'auprc')
-#     Returns:
-#         average cross-validation performance across the k folds as a float
-#     """
-#     # TODO: Implement this function
-#     skf = StratifiedKFold(n_splits=k)
-#     scores = []
-#     # For each split in the k folds...
-#     for train, val in skf.split(X,y):
-#         # Split the data into training and validation sets...
-#         X_train, y_train, X_val, y_val = ???
-#         # Fit the data to the training data...
-#         ???
-#         # And test on the ith fold.
-#         score = ???
-#         scores.append(score)
-#     # Return the average performance across all fold splits.
-#     return np.array(scores).mean()
-#
-#
+def cv_performance(clf, X, y, k=5, metric='accuracy'):
+    """
+    Splits the data X and the labels y into k folds.
+    Then, for each fold i in 1...k,
+        Train a classifier on all the data except the i-th fold, and test on the i-th fold.
+        Calculate the performance of the classifier and save the result.
+    In the end, return the average performance across the k folds.
+    Input:
+        clf: an instance of sklearn estimator
+        X: (N,d) array of feature vectors, where n is the number of examples
+           and d is the number of features
+        y: (N,) array of binary labels {1,-1}
+        k: an int specifying the number of folds (default=5)
+        metric: string specifying the performance metric (default='accuracy'
+             other options: 'precision', 'sensitivity', 'specificity',
+                'f1-score', 'auroc', and 'auprc')
+    Returns:
+        average cross-validation performance across the k folds as a float
+    """
+
+    skf = StratifiedKFold(n_splits=k)
+    scores = []
+    # For each split in the k folds...
+    for train, val in skf.split(X,y):
+        # Split the data into training and validation sets...
+        X_train, y_train, X_val, y_val = X[train, :], y[train], X[val, :], y[val]
+        # Fit the data to the training data...
+        clf.fit(X_train, y_train)
+        # And test on the ith fold.
+        score = performance(clf, X_val, y_val, metric)
+        scores.append(score)
+    # Return the average performance across all fold splits.
+    return np.array(scores).mean()
+
+
 # def select_C(X, y, C_range=[], penalty='l2', k=5, metric='accuracy'):
 #     """
 #     Sweeps different C hyperparameters of a logistic regression classifier,
@@ -309,12 +309,15 @@ if __name__ == '__main__':
 
     X_train, y_train, X_test, y_test, feature_names = get_train_test_split()
     clf = get_classifier()
-    clf.fit(X_train, y_train)
+    # clf.fit(X_train, y_train)
 
 
-    metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
-    for m in metric_list:
-        print(f"{m}:\t{performance(clf, X_test, y_test, m)}")
+    # metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
+    # for m in metric_list:
+    #     print(f"{m}:\t{performance(clf, X_test, y_test, m)}")
+
+    arr = cv_performance(clf, X_train, y_train)
+    print(arr)
     # df_labels = pd.read_csv('data/labels.csv')
     # df_labels = df_labels[:2500]
     # IDs = df_labels['RecordID'][:2500]
