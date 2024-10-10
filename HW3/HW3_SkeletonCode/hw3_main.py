@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+import sklearn.metrics
 from matplotlib import pyplot as plt
 
 from sklearn.linear_model import LogisticRegression
@@ -90,25 +91,47 @@ def normalize_feature_matrix(X):
 
     return X
 
-#
-# def performance(clf, X, y_true, metric='accuracy'):
-#     """
-#     Calculates the performance metric as evaluated on the true labels
-#     y_true versus the predicted scores from clf and X.
-#     Input:
-#         clf: an instance of sklearn estimator
-#         X : (N,d) np.array containing features
-#         y_true: (N,) np.array containing true labels
-#         metric: string specifying the performance metric (default='accuracy'
-#                  other options: 'precision', 'sensitivity', 'specificity',
-#                 'f1-score', 'auroc', and 'auprc')
-#     Returns:
-#         the performance measure as a float
-#     """
-#     # TODO: Implement this function
-#     ???
-#
-#
+
+def performance(clf, X, y_true, metric='accuracy'):
+    """
+    Calculates the performance metric as evaluated on the true labels
+    y_true versus the predicted scores from clf and X.
+    Input:
+        clf: an instance of sklearn estimator
+        X : (N,d) np.array containing features
+        y_true: (N,) np.array containing true labels
+        metric: string specifying the performance metric (default='accuracy'
+                 other options: 'precision', 'sensitivity', 'specificity',
+                'f1-score', 'auroc', and 'auprc')
+    Returns:
+        the performance measure as a float
+    """
+
+    metric = metric.lower()
+    y_pred = clf.predict(X)
+
+    if metric == "accuracy": # ratio of correct predictions
+        return metrics.accuracy_score(y_true=y_true, y_pred=y_pred)
+    elif metric == "precision": # ratio of true positives to all positive labels
+        return metrics.precision_score(y_true=y_true, y_pred=y_pred)
+    elif metric == "sensitivity": # ratio of correct positive classifications over all actual positives
+        return metrics.recall_score(y_true=y_true, y_pred=y_pred)
+    elif metric == "specificity": # ratio of correct negative classifications over all actual negatives
+        tn, fp, fn, tp = metrics.confusion_matrix(y_true=y_true, y_pred=y_pred).ravel()
+        return tn/(tn + fp)
+    elif metric == "f1-score": # harmonic mean of precision and recall
+        return metrics.f1_score(y_true=y_true, y_pred=y_pred)
+    elif metric == "auroc": #
+        prob = clf.predict_proba(X)[:, 1] # get the score for positive class
+        return metrics.roc_auc_score(y_true=y_true, y_score=prob)
+    elif metric == "auprc":
+        prob = clf.predict_proba(X)[:, 1] # get the score for positive class
+        return metrics.average_precision_score(y_true=y_true, y_score=prob)
+    else:
+        print("Unknown metric requested, aborting")
+        return
+
+
 # def cv_performance(clf, X, y, k=5, metric='accuracy'):
 #     """
 #     Splits the data X and the labels y into k folds.
@@ -205,19 +228,19 @@ def normalize_feature_matrix(X):
 #     print('Plot saved')
 #
 #
-# def q1(X, feature_names):
-#     """
-#     Given a feature matrix X, prints d, the number of features in the feature vector,
-#     and prints the average feature vector along with its corresponing feature name.
-#     """
-#     ##################################################################
-#     print("--------------------------------------------")
-#     print("Question 1(d): reporting dataset statistics:")
-#     print("\t", "d:", X.shape[1])
-#     print("\t", "Average feature vector:")
-#     print(pd.DataFrame({"Feature Name": feature_names, "Mean value": X.mean(axis=0)}))
-#
-#
+def q1(X, feature_names):
+    """
+    Given a feature matrix X, prints d, the number of features in the feature vector,
+    and prints the average feature vector along with its corresponing feature name.
+    """
+    ##################################################################
+    print("--------------------------------------------")
+    print("Question 1(d): reporting dataset statistics:")
+    print("\t", "d:", X.shape[1])
+    print("\t", "Average feature vector:")
+    print(pd.DataFrame({"Feature Name": feature_names, "Mean value": X.mean(axis=0)}))
+
+
 # def q2(X_train, y_train, X_test, y_test, metric_list, feature_names):
 #     """
 #     This function should contain all the code you implement to complete part 2
@@ -265,45 +288,46 @@ def normalize_feature_matrix(X):
 #     print("--------------------------------------------")
 #     print("Question 2.2(b): Plot the weights of C vs. L0-norm of theta, l1 penalty")
 #     plot_coefficients(X_train, y_train, 'l1', C_range)
-#
-#
-# def main():
-#     np.random.seed(42)
-#
-#     # Read data
-#     # NOTE: READING IN THE DATA WILL NOT WORK UNTIL YOU HAVE FINISHED
-#     #       IMPLEMENTING generate_feature_vector, fill_missing_values AND normalize_feature_matrix
-#     X_train, y_train, X_test, y_test, feature_names = get_train_test_split()
-#
-#     # TODO: Questions 1, 2
-#     metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
-#
-#     q1(X_train, feature_names)
-#     q2(X_train, y_train, X_test, y_test, metric_list, feature_names)
+
+
+def main():
+    np.random.seed(42)
+
+    # Read data
+    # NOTE: READING IN THE DATA WILL NOT WORK UNTIL YOU HAVE FINISHED
+    #       IMPLEMENTING generate_feature_vector, fill_missing_values AND normalize_feature_matrix
+    X_train, y_train, X_test, y_test, feature_names = get_train_test_split()
+
+    metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
+
+    q1(X_train, feature_names)
+    # q2(X_train, y_train, X_test, y_test, metric_list, feature_names)
 
 
 if __name__ == '__main__':
-    # main()
-    df_labels = pd.read_csv('data/labels.csv')
-    df_labels = df_labels[:2500]
-    IDs = df_labels['RecordID'][:2500]
-    raw_data = {}
-    for i in tqdm(IDs, desc='Loading files from disk'):
-        raw_data[i] = pd.read_csv('data/files/{}.csv'.format(i))
+    main()
 
-    features = Parallel(n_jobs=16)(delayed(hw3_main.generate_feature_vector)(df) for _, df in tqdm(raw_data.items(), desc='Generating feature vectors'))
-    df_features = pd.DataFrame(features).sort_index(axis=1)
-    feature_names = df_features.columns.tolist()
-    X, y = df_features.values, df_labels['In-hospital_death'].values
 
-    # print(X)
-
-    X = hw3_main.impute_missing_values(X)
-
-    xdf = pd.DataFrame(X)
-    print(xdf.describe())
-
-    X = normalize_feature_matrix(X)
-
-    xdf = pd.DataFrame(X)
-    print(xdf.describe())
+    # df_labels = pd.read_csv('data/labels.csv')
+    # df_labels = df_labels[:2500]
+    # IDs = df_labels['RecordID'][:2500]
+    # raw_data = {}
+    # for i in tqdm(IDs, desc='Loading files from disk'):
+    #     raw_data[i] = pd.read_csv('data/files/{}.csv'.format(i))
+    #
+    # features = Parallel(n_jobs=16)(delayed(hw3_main.generate_feature_vector)(df) for _, df in tqdm(raw_data.items(), desc='Generating feature vectors'))
+    # df_features = pd.DataFrame(features).sort_index(axis=1)
+    # feature_names = df_features.columns.tolist()
+    # X, y = df_features.values, df_labels['In-hospital_death'].values
+    #
+    # # print(X)
+    #
+    # X = hw3_main.impute_missing_values(X)
+    #
+    # xdf = pd.DataFrame(X)
+    # print(xdf.describe())
+    #
+    # X = normalize_feature_matrix(X)
+    #
+    # xdf = pd.DataFrame(X)
+    # print(xdf.describe())

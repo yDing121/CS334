@@ -120,9 +120,9 @@ def test_challenge_output():
 
 
 if __name__ == '__main__':
-    print()
     # X_train, y_train, X_test, y_test, feature_names = get_train_test_split()
     # avg_vec = np.mean(X_train, axis=0)
     #
     # for k, v in zip(feature_names, avg_vec):
     #     print("%16s: \t %.4f" % (k, v))
+    pass
