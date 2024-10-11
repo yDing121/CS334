@@ -68,6 +68,8 @@ def get_challenge_data():
     You should replace your preprocessing functions (generate_feature_vector,
     impute_missing_values, normalize_feature_matrix) with updated versions for the challenge
     """
+
+
     df_labels = pd.read_csv('data/labels.csv')
     df_labels = df_labels
     IDs = df_labels['RecordID']
