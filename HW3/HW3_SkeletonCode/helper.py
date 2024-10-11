@@ -78,11 +78,14 @@ def get_challenge_data():
         raw_data[i] = pd.read_csv('data/files/{}.csv'.format(i))
 
     features = Parallel(n_jobs=16)(delayed(hw3_challenge.generate_feature_vector_challenge)(df) for _, df in tqdm(raw_data.items(), desc='Generating feature vectors'))
+
     df_features = pd.DataFrame(features)
     feature_names = df_features.columns.tolist()
+
     X, y = df_features.values, df_labels['30-day_mortality'].values
     X = hw3_challenge.impute_missing_values_challenge(X)
     X = hw3_challenge.normalize_feature_matrix_challenge(X)
+
     return X[:10000], y[:10000], X[10000:], feature_names
 
 
