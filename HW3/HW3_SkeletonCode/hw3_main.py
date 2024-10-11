@@ -199,35 +199,39 @@ def select_C(X, y, C_range=[], penalty='l2', k=5, metric='accuracy'):
     # Return the C value with the maximum score
     maxval = max(scores, key=lambda x: x[1])
     return maxval[0]
-#
-#
-# def plot_coefficients(X, y, penalty, C_range):
-#     """
-#     Takes as input the training data X and labels y and plots the L0-norm
-#     (number of nonzero elements) of the coefficients learned by a classifier
-#     as a function of the C-values of the classifier.
-#     """
-#     print("Plotting the number of nonzero entries of the parameter vector as a function of C")
-#     norm0 = []
-#
-#     # TODO: Implement this function
-#     ???
-#
-#     # This code will plot your L0-norm as a function of C
-#     plt.plot(C_range, norm0)
-#     plt.axhline(y=X.shape[1], color='gray', linestyle=':')
-#     plt.xscale('log')
-#     plt.legend(['L0-norm'])
-#     plt.xlabel("Value of C")
-#     plt.ylabel("L0-norm of theta")
-#     plt.ylim(-2,50)
-#     plt.title('L0-norm of θ vs C, {}-penalized logistic regression'.format(penalty.upper()))
-#     plt.savefig('l0-norm_vs_C__'+penalty+'-penalty.png', dpi=200)
-#     plt.close()
-#
-#     print('Plot saved')
-#
-#
+
+
+def plot_coefficients(X, y, penalty, C_range):
+    """
+    Takes as input the training data X and labels y and plots the L0-norm
+    (number of nonzero elements) of the coefficients learned by a classifier
+    as a function of the C-values of the classifier.
+    """
+    print("Plotting the number of nonzero entries of the parameter vector as a function of C")
+    norm0 = []
+
+
+    for c in C_range:
+        clf = get_classifier(penalty=penalty, C=c)
+        clf.fit(X, y)
+        norm0.append(np.count_nonzero(clf.coef_))
+
+
+    # This code will plot your L0-norm as a function of C
+    plt.plot(C_range, norm0)
+    plt.axhline(y=X.shape[1], color='gray', linestyle=':')
+    plt.xscale('log')
+    plt.legend(['L0-norm'])
+    plt.xlabel("Value of C")
+    plt.ylabel("L0-norm of theta")
+    plt.ylim(-2,50)
+    plt.title('L0-norm of θ vs C, {}-penalized logistic regression'.format(penalty.upper()))
+    plt.savefig('l0-norm_vs_C__'+penalty+'-penalty.png', dpi=200)
+    plt.close()
+
+    print('Plot saved')
+
+
 def q1(X, feature_names):
     """
     Given a feature matrix X, prints d, the number of features in the feature vector,
@@ -269,29 +273,54 @@ def q2(X_train, y_train, X_test, y_test, metric_list, feature_names):
         test_perf = performance(clf, X_test, y_test, metric)
         print("C = " + str(best_C) + " Test Performance on metric " + metric + ": %.4f" % test_perf)
 
-    # ##################################################################
-    # print("--------------------------------------------")
-    # print("Question 2.1(e): Plot L0-norm of theta coefficients vs. C, l2 penalty")
-    # plot_coefficients(X_train, y_train, 'l2', C_range)
-    #
-    # ##################################################################
-    # print("--------------------------------------------")
-    # print("Question 2.1(f): Displaying the most positive and negative coefficients and features")
-    # best_C = ???
-    # print('Positive coefficients...')
-    # print('Negative coefficients...')
-    #
-    #
-    # ##################################################################
-    # print("--------------------------------------------")
-    # print("Question 2.2(a): Logistic Regression with L1-penalty, grid search, AUROC")
+    ##################################################################
+    print("--------------------------------------------")
+    print("Question 2.1(e): Plot L0-norm of theta coefficients vs. C, l2 penalty")
+    plot_coefficients(X_train, y_train, 'l2', C_range)
+
+    ##################################################################
+    print("--------------------------------------------")
+    print("Question 2.1(f): Displaying the most positive and negative coefficients and features")
+
+    clf = get_classifier(penalty="l2", C=1.0)
+    clf.fit(X_train, y_train)
+    feature_pairs = sorted(zip(feature_names, clf.coef_[0].tolist()), key=lambda x: x[1], reverse=True)
+
+    print('Positive coefficients...')
+
+    for i in range(4):
+        print("%.4f %16s" % (feature_pairs[i][1], feature_pairs[i][0]))
+        # print(f"{feature_pairs[i][1]}:\t{feature_pairs[i][0]}")
+
+    print('Negative coefficients...')
+
+    for i in range(-1, -5, -1):
+        print("%.4f %16s" % (feature_pairs[i][1], feature_pairs[i][0]))
+        # print(f"{feature_pairs[i][1]}:\t{feature_pairs[i][0]}")
+
+
+    ##################################################################
+    print("--------------------------------------------")
+    print("Question 2.2(a): Logistic Regression with L1-penalty, grid search, AUROC")
     # best_C = ???
     # test_performance = ???
-    #
-    # ##################################################################
-    # print("--------------------------------------------")
-    # print("Question 2.2(b): Plot the weights of C vs. L0-norm of theta, l1 penalty")
-    # plot_coefficients(X_train, y_train, 'l1', C_range)
+
+    for metric in metric_list:
+        best_C = select_C(X_train, y_train, C_range, 'l2', 5, metric)
+        print("Best C: %.6f" % best_C)
+
+    # Fit the classifier with the best C
+    clf = get_classifier(penalty='l1', C=best_C)
+    clf.fit(X_train, y_train)
+
+    for metric in metric_list:
+        test_perf = performance(clf, X_test, y_test, metric)
+        print("C = " + str(best_C) + " Test Performance on metric " + metric + ": %.4f" % test_perf)
+
+    ##################################################################
+    print("--------------------------------------------")
+    print("Question 2.2(b): Plot the weights of C vs. L0-norm of theta, l1 penalty")
+    plot_coefficients(X_train, y_train, 'l1', C_range)
 
 
 def main():
