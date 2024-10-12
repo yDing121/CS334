@@ -1,14 +1,17 @@
-# hw3_challenge.py
-
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from joblib import Parallel, delayed
+import random
 
+
+from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 
 import hw3_main
 from helper import *
+
+random.seed(42)
 
 def generate_feature_vector_challenge(df):
     static_variables = config['static']
@@ -62,10 +65,6 @@ def get_train_val_split(X: np.ndarray[float], y: np.ndarray[int]):
     return X_train, X_val, y_train, y_val
 
 def run_challenge(X_challenge, y_challenge, X_heldout, feature_names):
-    # TODO:
-    # Read challenge data
-    # Train a linear classifier and apply to heldout dataset features
-    # Use generate_challenge_labels to print the predicted labels
     print("================= Part 3 ===================")
     print("Part 3: Challenge")
 
@@ -79,7 +78,7 @@ def run_challenge(X_challenge, y_challenge, X_heldout, feature_names):
     for alpha in alpha_range:
         for penalty in penalties:
             clf = SGDClassifier(loss="modified_huber", alpha=alpha, penalty=penalty)
-            clf.fit()
+            clf.fit(X_train, y_train)
 
             score = hw3_main.cv_performance(clf, X_train, y_train, 10, "auroc")
             print("alpha: {:.6f} \t penalty: {:10s} \t score: {:.4f}".format(alpha, penalty, score))
@@ -87,10 +86,17 @@ def run_challenge(X_challenge, y_challenge, X_heldout, feature_names):
 
     best = sorted(scores, key=lambda x: x[2], reverse=True)[0]
     clf = SGDClassifier(loss="modified_huber", alpha=best[0], penalty=best[1])
+    clf.fit(X_train, y_train)
 
     test_perf = hw3_main.performance(clf, X_val, y_val, "auroc")
-    print("alpha = " + str(best[0]) + "penalty = " + str(best[1]) +
-          " Test Performance on metric " + "auroc" + ": %.4f" % test_perf)
+    print("alpha = " + str(best[0]) + "\npenalty = " + str(best[1]) +
+          "\nTest Performance on metric " + "auroc" + ": %.4f" % test_perf)
+
+    metric_list = ["accuracy", "precision", "sensitivity", "specificity", "f1_score", "auroc", "auprc"]
+
+    for metric in metric_list:
+        test_perf = hw3_main.performance(clf, X_val, y_val, metric)
+        print("Validation Performance on metric " + metric + ": %.4f" % test_perf)
 
     y_score = clf.predict_proba(X_heldout)[:, 1]
     y_label = clf.predict(X_heldout)
