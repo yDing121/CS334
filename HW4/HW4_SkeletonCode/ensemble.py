@@ -5,10 +5,14 @@ Follow the instructions in the homework to complete the assignment.
 """
 
 import random
+from logging import critical
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from collections import Counter
+
+import sklearn.tree
 from sklearn import metrics, utils
 from sklearn.datasets import fetch_openml
 from sklearn.tree import DecisionTreeClassifier
@@ -48,6 +52,13 @@ def random_forest(X_train, y_train, X_test, y_test, m, n_clf):
     Returns:
         accuracy : float - accuracy of random forest classifier on X_test samples
     """
+
+
+    for _ in range(n_clf):
+        clf = DecisionTreeClassifier(criterion="entropy", max_features=m)
+        clf.fit(X_train, y_train)
+
+
     # TODO: Implement this function
     return accuracy
 
