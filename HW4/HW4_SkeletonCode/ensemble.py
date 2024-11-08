@@ -52,14 +52,45 @@ def random_forest(X_train, y_train, X_test, y_test, m, n_clf):
     Returns:
         accuracy : float - accuracy of random forest classifier on X_test samples
     """
+    n_train = X_train.shape[0]
+    n_test = X_test.shape[0]
+
+    # res = np.zeros((n_test, n_clf))
+    bres = []
+
+    for i in range(n_clf):
+        indices = np.random.choice(n_train, n_train, replace=True)
+        X_bs = X_train[indices]
+        y_bs = y_train[indices]
 
 
-    for _ in range(n_clf):
         clf = DecisionTreeClassifier(criterion="entropy", max_features=m)
-        clf.fit(X_train, y_train)
+        clf.fit(X_bs, y_bs)
+        preds = clf.predict(X_test)
 
+        # res[:, i] = preds
+        bres.append(preds)
 
-    # TODO: Implement this function
+    # final_pred = np.zeros(n_test, dtype=int)
+    #
+    # for i in range(n_test):
+    #     vals, cnts = np.unique(res[i, :], return_counts=True)
+    #     max_cnt = np.max(cnts)
+    #     cands = vals[cnts == max_cnt]
+    #     final_pred[i] = np.random.choice(cands)
+    #
+    fpred = majority_vote(bres)
+
+    n_correct = 0
+
+    for i in range(n_test):
+        # if final_pred[i] == y_test[i]:
+        #     n_correct += 1
+        if fpred[i] == y_test[i]:
+            n_correct += 1
+
+    accuracy = n_correct/n_test
+
     return accuracy
 
 
@@ -134,4 +165,8 @@ def main():
 
 
 if __name__ == '__main__':
+    np.random.seed(69)
     main()
+    # X, y = load_mnist([1,3,5])
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # random_forest(X_train, y_train, X_test, y_test, 10, 10)
