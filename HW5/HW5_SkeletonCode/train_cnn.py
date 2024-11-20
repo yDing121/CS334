@@ -74,8 +74,9 @@ def main():
     model = CNN().to(device)
 
     # TODO: define loss function, and optimizer
-    criterion = ???
-    optimizer = ??? # use config('cnn.learning_rate') as the learning rate
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=config('cnn.learning_rate'))
+    # use config('cnn.learning_rate') as the learning rate
     #
 
     print('Number of float-valued parameters:', utils.count_parameters(model))
