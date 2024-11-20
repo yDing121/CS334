@@ -61,8 +61,9 @@ class CNN(nn.Module):
             nn.init.constant_(conv.bias, 0.0)
 
         for fc in [self.fc1, self.fc2, self.fc3]:
-            nn.init.normal_(fc.weight, 0.0, 1/fc.in_features)
+            nn.init.normal_(fc.weight, 0.0, 1/sqrt(fc.in_features)) # 1/sqrt bc nn.init.normal_ takes std
             nn.init.constant_(conv.bias, 0.0)
+
 
 
         
