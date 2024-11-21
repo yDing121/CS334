@@ -6,8 +6,10 @@ Challenge - Train
 '''
 import torch
 import numpy as np
+from torchvision.models import resnet18
+
 import utils
-from data import get_train_val_test_loaders
+from challenge_data import get_train_val_test_loaders
 from challenge_model import Challenge
 from utils import *
 
@@ -17,15 +19,22 @@ def _train_epoch(data_loader, model, criterion, optimizer):
     Use `optimizer` to optimize the specified `criterion`
     """
     # TODO: complete the training step, see train_cnn.py
+    # for i, (X, y) in enumerate(data_loader):
+    #     # clear parameter gradients
+    #     ...
+    #     #
+    #
+    #     # forward + backward + optimize
+    #     ...
     for i, (X, y) in enumerate(data_loader):
         # clear parameter gradients
-        ...
-        #
+        optimizer.zero_grad()
 
         # forward + backward + optimize
-        ...
-        #
-    #
+        output = model(X)
+        loss = criterion(output, y)
+        loss.backward()
+        optimizer.step()
 
 def _evaluate_epoch(axes, tr_loader, val_loader, model, criterion, epoch, stats):
     with torch.no_grad():
@@ -66,11 +75,15 @@ def main():
     # data loaders
     tr_loader, va_loader, te_loader, _ = get_train_val_test_loaders(
         num_classes=config('challenge.num_classes'))
+    # tr_loader, va_loader, te_loader, _ = get_train_val_test_loaders(
+    #     num_classes=10)
 
     # TODO: define model, loss function, and optimizer
-    model = Challenge(...).to(device)
-    criterion = ???
-    optimizer = ??? # you may use config('challenge.learning_rate')
+    model = Challenge().to(device)
+    criterion = torch.nn.CrossEntropyLoss()
+    # optimizer = torch.optim.Adam(model.parameters(), lr=5*config('challenge.learning_rate'))
+    optimizer = torch.optim.AdamW(model.parameters(), lr=5*config('challenge.learning_rate')) # you may use config('challenge.learning_rate')
+    # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
     #
 
     # Attempts to restore the latest checkpoint if exists
@@ -93,6 +106,7 @@ def main():
 
         # Save model parameters
         save_checkpoint(model, epoch+1, config('challenge.checkpoint'), stats)
+        # scheduler.step()
 
     print('Finished Training')
 
