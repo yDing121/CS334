@@ -12,7 +12,6 @@ class CNN(nn.Module):
     def __init__(self):
         super().__init__()
 
-        # TODO: define each layer
         self.conv1 = nn.Conv2d(
             in_channels=3,
             out_channels=16,
@@ -70,7 +69,6 @@ class CNN(nn.Module):
     def forward(self, x):
         N, C, H, W = x.shape
 
-        # TODO: forward pass
 
         z = F.relu(self.conv1(x))
         z = F.relu(self.conv2(z))
