@@ -73,7 +73,6 @@ def main():
     # Model
     model = CNN().to(device)
 
-    # TODO: define loss function, and optimizer
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config('cnn.learning_rate'))
     # use config('cnn.learning_rate') as the learning rate
