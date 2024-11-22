@@ -33,7 +33,7 @@ class Challenge(nn.Module):
 
             nn.Conv2d(64, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.BatchNorm2d(256),  # Batch Normalization
+            nn.BatchNorm2d(256),
             nn.MaxPool2d(2, 2),
 
             nn.Conv2d(256, 512, kernel_size=7, stride=1, padding=3),

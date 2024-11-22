@@ -52,7 +52,7 @@ class Cnn_2_2(nn.Module):
             nn.Dropout(0.4),
             nn.Linear(512, 256),
             nn.ReLU(),
-            nn.Dropout(0.3),  # Additional Dropout
+            nn.Dropout(0.3),
             nn.Linear(256, 128),
             nn.ReLU(),
             nn.Linear(128, 32),
