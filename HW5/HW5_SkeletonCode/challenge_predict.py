@@ -7,7 +7,7 @@ Challenge - Predict
 import argparse
 import numpy as np
 import pandas as pd
-from data import get_train_val_test_loaders
+from challenge_data import get_train_val_test_loaders
 from challenge_model import Challenge
 from utils import *
 import utils
@@ -31,7 +31,7 @@ def main():
     _, _, te_loader, get_semantic_label = get_train_val_test_loaders(num_classes=config('challenge.num_classes'))
 
     # Attempts to restore the latest checkpoint if exists
-    model = Challenge(...)
+    model = Challenge()
     model, _, _ = restore_checkpoint(model, config('challenge.checkpoint'))
     model = model.to(device)
     model.eval()

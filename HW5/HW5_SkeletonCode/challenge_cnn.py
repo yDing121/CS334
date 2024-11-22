@@ -1,18 +1,12 @@
-'''
-Challenge - Model
-    Constructs a pytorch model for a convolutional neural network
-'''
-from math import sqrt
-
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.nn.init as init
+import torch.nn.functional as F
 
 
-class Challenge(nn.Module):
+class Cnn_2_2(nn.Module):
     def __init__(self):
-        super(Challenge, self).__init__()
+        super(Cnn_2_2, self).__init__()
 
         # Convolutional layers
         self.conv_layers = nn.Sequential(

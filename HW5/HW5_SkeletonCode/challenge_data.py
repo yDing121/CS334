@@ -19,6 +19,7 @@ def resize(X):
         the resized images as a numpy array.
     """
     image_dim = config('image_dim')
+    # image_dim = 64
     
     image_size = (image_dim, image_dim)
     resized = []
@@ -50,7 +51,6 @@ class ImageStandardizer(object):
         return (X - self.image_mean) / self.image_std
 
 class DogsDataset(Dataset):
-
     def __init__(self, partition, num_classes=10):
         """
         Reads in the necessary data from disk.
@@ -67,7 +67,7 @@ class DogsDataset(Dataset):
         # Load in all the data we need from disk
         self.metadata = pd.read_csv(config('csv_file'), index_col=0)
         self.X, self.y = self._load_data()
-        self.X = resize(self.X)
+        # self.X = resize(self.X) # remove resize
 
         self.semantic_labels = dict(zip(
             self.metadata['numeric_label'].dropna().astype(int),

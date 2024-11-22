@@ -62,6 +62,35 @@ def log_cnn_training(epoch, stats):
     print('\tTrain Loss: {}'.format(train_loss))
     print('\tTrain Accuracy: {}'.format(train_acc))
 
+def log_cnn_training_c(epoch, stats):
+    """
+    Logs the validation accuracy and loss to the terminal
+    """
+
+    (train_loss, val_loss, train_acc, val_acc,
+     train_f1, val_f1, train_auroc, val_auroc,
+     train_auprc, val_auprc, train_recall, val_recall) = \
+        stats[-1]
+    # val_acc, val_loss, train_acc, train_loss, train_f1, train_auroc, train_auprc, val_f1, val_auroc, val_auprc = \
+    # stats[-1]
+
+    print(f"Epoch {epoch}:")
+    print(f"\tTrain Loss: {train_loss:.4f}")
+    print(f"\tTrain Accuracy: {train_acc:.4f}")
+    print(f"\tTrain F1: {train_f1:.4f}")
+    print(f"\tTrain AUROC: {train_auroc:.4f}")
+    print(f"\tTrain AUPRC: {train_auprc:.4f}")
+    print(f"\tTrain Recall: {train_recall:.4f}")
+
+    print(f"\tValidation Loss: {val_loss:.4f}")
+    print(f"\tValidation Accuracy: {val_acc:.4f}")
+    print(f"\tValidation F1: {val_f1:.4f}")
+    print(f"\tValidation AUROC: {val_auroc:.4f}")
+    print(f"\tValidation AUPRC: {val_auprc:.4f}")
+    print(f"\tValidation Recall: {val_recall:.4f}")
+
+    print("---"*8)
+
 def make_cnn_training_plot():
     """
     Runs the setup for an interactive matplotlib graph that logs the loss and
@@ -74,6 +103,41 @@ def make_cnn_training_plot():
     axes[0].set_ylabel('Accuracy')
     axes[1].set_xlabel('Epoch')
     axes[1].set_ylabel('Loss')
+
+    return axes
+
+def make_cnn_training_plot_c():
+    """
+    Runs the setup for an interactive matplotlib graph that logs the loss and
+    accuracy along with other metrics like F1, AUROC, and AUPRC.
+    """
+    plt.ion()
+    fig, axes = plt.subplots(3, 2, figsize=(12, 10))  # Create a 2x2 grid of subplots
+    plt.suptitle('CNN Training')
+
+    # Accuracy Plot
+    axes[0, 0].set_xlabel('Epoch')
+    axes[0, 0].set_ylabel('Accuracy')
+
+    # Loss Plot
+    axes[0, 1].set_xlabel('Epoch')
+    axes[0, 1].set_ylabel('Loss')
+
+    # F1 Score Plot
+    axes[1, 0].set_xlabel('Epoch')
+    axes[1, 0].set_ylabel('F1 Score')
+
+    # AUROC Plot
+    axes[1, 1].set_xlabel('Epoch')
+    axes[1, 1].set_ylabel('AUROC')
+
+    # AUPRC Plot
+    axes[2, 0].set_xlabel('Epoch')
+    axes[2, 0].set_ylabel('AUPRC')
+
+    # AUPRC Plot
+    axes[2, 1].set_xlabel('Epoch')
+    axes[2, 1].set_ylabel('Recall')
 
     return axes
 
@@ -95,6 +159,69 @@ def update_cnn_training_plot(axes, epoch, stats):
     axes[1].plot(range(epoch - len(stats) + 1, epoch + 1), train_loss,
         linestyle='--', marker='o', color='r')
     axes[1].legend(['Validation', 'Train'])
+    plt.pause(0.00001)
+
+def update_cnn_training_plot_c(axes, epoch, stats):
+    """
+    Updates the training plot with a new data point for loss, accuracy, F1 score,
+    AUROC, and AUPRC.
+    """
+
+    train_loss = [s[0] for s in stats]
+    val_loss = [s[1] for s in stats]
+    train_acc = [s[2] for s in stats]
+    val_acc = [s[3] for s in stats]
+    train_f1 = [s[4] for s in stats]
+    val_f1 = [s[5] for s in stats]
+    train_auroc = [s[6] for s in stats]
+    val_auroc = [s[7] for s in stats]
+    train_auprc = [s[8] for s in stats]
+    val_auprc = [s[9] for s in stats]
+    train_recall = [s[10] for s in stats]
+    val_recall = [s[11] for s in stats]
+
+    # Accuracy Plot
+    axes[0, 0].plot(range(epoch - len(stats) + 1, epoch + 1), val_acc,
+        linestyle='--', marker='o', color='b')
+    axes[0, 0].plot(range(epoch - len(stats) + 1, epoch + 1), train_acc,
+        linestyle='--', marker='o', color='r')
+    axes[0, 0].legend(['Validation', 'Train'])
+
+    # Loss Plot
+    axes[0, 1].plot(range(epoch - len(stats) + 1, epoch + 1), val_loss,
+        linestyle='--', marker='o', color='b')
+    axes[0, 1].plot(range(epoch - len(stats) + 1, epoch + 1), train_loss,
+        linestyle='--', marker='o', color='r')
+    axes[0, 1].legend(['Validation', 'Train'])
+
+    # F1 Score Plot
+    axes[1, 0].plot(range(epoch - len(stats) + 1, epoch + 1), val_f1,
+        linestyle='--', marker='o', color='b')
+    axes[1, 0].plot(range(epoch - len(stats) + 1, epoch + 1), train_f1,
+        linestyle='--', marker='o', color='r')
+    axes[1, 0].legend(['Validation', 'Train'])
+
+    # AUROC Plot
+    axes[1, 1].plot(range(epoch - len(stats) + 1, epoch + 1), val_auroc,
+        linestyle='--', marker='o', color='b')
+    axes[1, 1].plot(range(epoch - len(stats) + 1, epoch + 1), train_auroc,
+        linestyle='--', marker='o', color='r')
+    axes[1, 1].legend(['Validation', 'Train'])
+
+    # AUPRC Plot
+    axes[2, 0].plot(range(epoch - len(stats) + 1, epoch + 1), val_auprc,
+        linestyle='--', marker='o', color='b')
+    axes[2, 0].plot(range(epoch - len(stats) + 1, epoch + 1), train_auprc,
+        linestyle='--', marker='o', color='r')
+    axes[2, 0].legend(['Validation', 'Train'])
+
+    # Recall Plot
+    axes[2, 1].plot(range(epoch - len(stats) + 1, epoch + 1), val_recall,
+        linestyle='--', marker='o', color='b')
+    axes[2, 1].plot(range(epoch - len(stats) + 1, epoch + 1), train_recall,
+        linestyle='--', marker='o', color='r')
+    axes[2, 1].legend(['Validation', 'Train'])
+
     plt.pause(0.00001)
 
 def save_cnn_training_plot():
