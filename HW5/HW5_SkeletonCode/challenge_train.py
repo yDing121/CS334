@@ -15,6 +15,11 @@ import torch
 import numpy as np
 from sklearn.metrics import f1_score, roc_auc_score, average_precision_score, recall_score
 import torch.nn.functional as F
+from collections import Counter
+import torch
+
+
+
 
 
 def _train_epoch(data_loader, model, criterion, optimizer):
@@ -140,6 +145,17 @@ def main():
         num_classes=config('challenge.num_classes'))
     # tr_loader, va_loader, te_loader, _ = get_train_val_test_loaders(
     #     num_classes=10)
+
+    # Assuming `tr_loader` is your training DataLoader
+    all_labels = []
+
+    for _, labels in tr_loader:  # Loop through the DataLoader
+        all_labels.extend(labels.tolist())  # Append all labels
+
+    # Count occurrences of each class
+    label_counts = Counter(all_labels)
+    print("Class distribution:", label_counts)
+    print()
 
     # TODO: define model, loss function, and optimizer
     model = Challenge().to(device)

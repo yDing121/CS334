@@ -65,11 +65,11 @@ class Cnn_2_2(nn.Module):
 
     def _init_weights(self, layer):
         if isinstance(layer, nn.Conv2d):
-            init.kaiming_normal_(layer.weight, mode='fan_out', nonlinearity='relu')  # He initialization for Conv2d
+            init.kaiming_normal_(layer.weight, mode='fan_out', nonlinearity='relu')
             if layer.bias is not None:
                 init.zeros_(layer.bias)
         elif isinstance(layer, nn.Linear):
-            init.xavier_normal_(layer.weight)  # Xavier initialization for Linear layers
+            init.xavier_normal_(layer.weight)
             if layer.bias is not None:
                 init.zeros_(layer.bias)
 
