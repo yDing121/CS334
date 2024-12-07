@@ -46,8 +46,8 @@ class BernoulliMAB(MultiArmedBandit):
 def epsilon_greedy(mab, T, epsilon):
     # Initialization
     k = len(mab)
-    Q = np.zeros(k)
-    N = np.zeros(k)
+    Q = np.zeros(k, dtype=float)
+    N = np.zeros(k, dtype=int)
     
     rewards = []  # reward at each time step
     optimals = [] # whether the optimal arm was selected at each time step
@@ -80,7 +80,7 @@ def optimistic_initial_values(mab, T, Q1):
     # Initialization
     k = len(mab)
     Q = np.full(k, Q1, dtype=float) # figuring out that this needed float was such a pain
-    N = np.ones(k)
+    N = np.ones(k, dtype=int)
 
     rewards = []  # reward at each time step
     optimals = [] # whether the optimal arm was selected at each time step
@@ -108,19 +108,21 @@ def optimistic_initial_values(mab, T, Q1):
 def upper_confidence_bounds(mab, T, c):
     # Initialization
     k = len(mab)
-    Q = np.zeros(k)
-    N = np.zeros(k)
+    Q = np.zeros(k, dtype=float)
+    N = np.zeros(k, dtype=int)
 
     rewards = []  # reward at each time step
     optimals = [] # whether the optimal arm was selected at each time step
     regrets = []  # cumulative regret at each time step
 
     for t in range(1,T):
-        # This doesn't work at t=0 because of the ln, so I changed the time steps to start from 1
-        # I also use a hack to make sure we don't get division by 0
         # Action selection: greedy wrt UCB scores
-        U = Q + c * np.sqrt(np.log(t)/np.maximum(N, 1))
-        a = random_argmax(U)
+        if 0 in N:
+            # Equivalent to setting the exploration bonus to infinity
+            a = np.argmin(N)
+        else:
+            U = Q + c * np.sqrt(np.log(t)/N)
+            a = random_argmax(U)
 
         # Pull arm a and observe reward
         r = mab.pull(a)
@@ -258,6 +260,6 @@ if __name__ == '__main__':
     runs = 100
 
     # Run the algorithms
-    # part_a(mab, T, runs)
+    part_a(mab, T, runs)
     part_b(mab, T, runs)
-    # part_c(mab, T, runs)
+    part_c(mab, T, runs)
