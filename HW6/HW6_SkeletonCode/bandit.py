@@ -79,24 +79,24 @@ def epsilon_greedy(mab, T, epsilon):
 def optimistic_initial_values(mab, T, Q1):
     # Initialization
     k = len(mab)
-    Q = ???
-    N = ???
-    
+    Q = np.full(k, Q1, dtype=float) # figuring out that this needed float was such a pain
+    N = np.ones(k)
+
     rewards = []  # reward at each time step
     optimals = [] # whether the optimal arm was selected at each time step
     regrets = []  # cumulative regret at each time step
 
     for t in range(T):
         # Action selection: greedy
-        a = ???
-        
+        a = random_argmax(Q)
+
         # Pull arm a and observe reward
         r = mab.pull(a)
 
         # Update N and Q
-        N[a] = ???
-        Q[a] = ???
-        
+        N[a] = N[a] + 1
+        Q[a] = Q[a] + (r - Q[a]) / N[a]
+
         # Track learning metrics
         rewards.append(r)
         optimals.append(mab.means[a] == mab.means.max())
@@ -108,25 +108,27 @@ def optimistic_initial_values(mab, T, Q1):
 def upper_confidence_bounds(mab, T, c):
     # Initialization
     k = len(mab)
-    Q = ???
-    N = ???
-    
+    Q = np.zeros(k)
+    N = np.zeros(k)
+
     rewards = []  # reward at each time step
     optimals = [] # whether the optimal arm was selected at each time step
     regrets = []  # cumulative regret at each time step
 
-    for t in range(T):
+    for t in range(1,T):
+        # This doesn't work at t=0 because of the ln, so I changed the time steps to start from 1
+        # I also use a hack to make sure we don't get division by 0
         # Action selection: greedy wrt UCB scores
-        ???
-        a = ???
+        U = Q + c * np.sqrt(np.log(t)/np.maximum(N, 1))
+        a = random_argmax(U)
 
         # Pull arm a and observe reward
         r = mab.pull(a)
 
         # Update N and Q
-        N[a] = ???
-        Q[a] = ???
-        
+        N[a] = N[a] + 1
+        Q[a] = Q[a] + (r - Q[a]) / N[a]
+
         # Track learning metrics
         rewards.append(r)
         optimals.append(mab.means[a] == mab.means.max())
@@ -256,6 +258,6 @@ if __name__ == '__main__':
     runs = 100
 
     # Run the algorithms
-    part_a(mab, T, runs)
+    # part_a(mab, T, runs)
     part_b(mab, T, runs)
-    part_c(mab, T, runs)
+    # part_c(mab, T, runs)
