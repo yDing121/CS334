@@ -333,11 +333,3 @@ def predictions(logits):
     _, pred = torch.max(logits, 1)
     return pred
     ##
-
-
-if __name__ == '__main__':
-    if torch.cuda.is_available():
-        device_name = torch.cuda.get_device_name(torch.cuda.current_device())
-        print(f"CUDA Device Name: {device_name}")
-    else:
-        print("CUDA is not available.")

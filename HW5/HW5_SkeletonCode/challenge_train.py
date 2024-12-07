@@ -4,7 +4,6 @@ Challenge - Train
     Periodically outputs training information, and saves model checkpoints
     Usage: python train_challenge.py
 '''
-from torch.nn.modules import transformer
 
 import utils
 from challenge_data import get_train_val_test_loaders
@@ -158,18 +157,8 @@ def main():
     print()
 
     # TODO: define model, loss function, and optimizer
-    # model = Challenge().to(device)
+    model = Challenge().to(device)
     # model = Cnn_2_2().to(device)
-
-    model = SimpleViT(
-        image_size=64,
-        patch_size=4,
-        num_classes=5,
-        dim=512,
-        depth=8,
-        heads=8,
-        mlp_dim=512
-    ).to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
 
