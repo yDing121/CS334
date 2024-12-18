@@ -4,6 +4,8 @@ Challenge - Train
     Periodically outputs training information, and saves model checkpoints
     Usage: python train_challenge.py
 '''
+import torchvision.models
+from torchvision.models.quantization import resnet50
 
 import utils
 from challenge_data import get_train_val_test_loaders
@@ -18,7 +20,7 @@ import torch.nn.functional as F
 from collections import Counter
 import torch
 from vit_pytorch import SimpleViT
-
+from torchvision.models import resnet18, resnet101
 
 
 def _train_epoch(data_loader, model, criterion, optimizer):
@@ -157,8 +159,12 @@ def main():
     print()
 
     # TODO: define model, loss function, and optimizer
-    model = Challenge().to(device)
+    # model = Challenge().to(device)
     # model = Cnn_2_2().to(device)
+    # model = resnet18(weights=torchvision.models.ResNet18_Weights.DEFAULT)
+    model = resnet101(weights=None)
+    model.fc = torch.nn.Linear(in_features=2048, out_features=5)
+    model.to(device)
 
     criterion = torch.nn.CrossEntropyLoss()
 
